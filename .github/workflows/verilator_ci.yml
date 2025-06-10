@@ -1,0 +1,90 @@
+name: Verilator CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verilator-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            shell: bash
+          - os: macos-latest
+            shell: bash
+          - os: windows-latest
+            shell: msys2 {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git autoconf flex bison make libfl2 \
+              libfl-dev zlib1g-dev g++ libgoogle-perftools-dev ccache
+
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install autoconf bison flex make gperf gnu-sed pkg-config
+          brew link --overwrite bison
+          brew link --overwrite flex
+
+      - name: Install dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: msys2/setup-msys2@v2
+        with:
+          install: >-
+            base-devel
+            git
+            autoconf
+            flex
+            bison
+            make
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-pkg-config
+
+      - name: Cache Verilator build
+        id: verilator-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            verilator
+            ~/.verilator-cache
+          key: verilator-${{ matrix.os }}-${{ hashFiles('verilator/.git/HEAD') }}
+
+      - name: Clone Verilator
+        if: steps.verilator-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/verilator/verilator.git
+          cd verilator
+          git checkout stable
+
+      - name: Build and Install Verilator (Linux/macOS)
+        if: runner.os != 'Windows' && steps.verilator-cache.outputs.cache-hit != 'true'
+        run: |
+          cd verilator
+          autoconf
+          ./configure
+          make -j$(nproc)
+          sudo make install
+
+      - name: Build and Install Verilator (Windows)
+        if: runner.os == 'Windows' && steps.verilator-cache.outputs.cache-hit != 'true'
+        shell: msys2 {0}
+        run: |
+          cd verilator
+          autoconf
+          ./configure
+          make -j$(nproc)
+          make install
+
+      - name: Verify Verilator
+        run: verilator --version

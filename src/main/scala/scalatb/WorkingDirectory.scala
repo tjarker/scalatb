@@ -27,11 +27,17 @@ class WorkingDirectory(val dir: File) {
         file
     }
 
-    def addArtifact(file: File): Unit = {
-        if (!file.exists()) {
-            throw new IllegalArgumentException(s"File ${file.getAbsolutePath} does not exist.")
-        }
+    def addSubDir(file: File): Unit = {
         artifacts += file
+    }
+
+    def addArtifact(file: File): Unit = {
+        artifacts += file
+    }
+
+    def /(name: String): File = {
+        val file = new File(dir, name)
+        file
     }
 
     def deleteArtifact(file: File): Unit = {

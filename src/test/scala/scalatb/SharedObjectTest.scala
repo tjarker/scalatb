@@ -15,7 +15,6 @@ class SharedObjectTest extends AnyFunSpec with Matchers {
       val code = s"""
         |#include <stdio.h>
         |int $funName(int a, int b) {
-        |  printf("Hello from C!\\n");
         |  return a + b;
         |}
         """.stripMargin
@@ -32,7 +31,7 @@ class SharedObjectTest extends AnyFunSpec with Matchers {
 
       helloFunction.invokeInt(Array(11, 31)) shouldEqual 42
 
-      workingDir.clean()
+      workingDir.delete()
     }
   }
 
