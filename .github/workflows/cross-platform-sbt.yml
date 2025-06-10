@@ -42,13 +42,14 @@ jobs:
       with:
         install: >-
           mingw-w64-x86_64-verilator
-    - name: Add Verilator to PATH (Windows)
+    - name: Build and Test (Windows)
       if: matrix.os == 'windows-latest'
       shell: msys2 {0}
       run: |
-        echo "Adding Verilator to PATH"
-        echo "C:/msys64/mingw64/bin" >> $GITHUB_PATH
-    - name: Check Verilator version
-      run: verilator --version
-    - name: Build and Test
-      run: sbt +test
+        verilator --version
+        sbt +test
+    - name: Build and Test (Linux/macOS)
+      if: matrix.os != 'windows-latest'
+      run: |
+        verilator --version
+        sbt +test
