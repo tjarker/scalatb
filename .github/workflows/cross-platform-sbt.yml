@@ -8,6 +8,15 @@ jobs:
     strategy:
       matrix:
         OS: ["ubuntu-latest", "ubuntu-24.04-arm", "macos-latest", "windows-latest"]
+        include:
+          - os: ubuntu-latest
+            shell: bash
+          - os: ubuntu-24.04-arm
+            shell: bash
+          - os: macos-latest
+            shell: bash
+          - os: windows-latest
+            shell: msys2 {0}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -18,5 +27,20 @@ jobs:
         java-version: 23
     - name: Setup sbt launcher
       uses: sbt/setup-sbt@v1
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-24.04-arm'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y verilator
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install verilator
+    - name: Install dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: >-
+          mingw-w64-x86_64-verilator
     - name: Build and Test
       run: sbt +test

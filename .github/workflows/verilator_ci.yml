@@ -2,8 +2,11 @@ name: Verilator CI
 
 on:
   push:
-    branches: [main]
+    
   pull_request:
+    branches:
+      - main
+      
 
 jobs:
   verilator-test:
