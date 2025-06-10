@@ -23,11 +23,6 @@ class SharedObject(libFile: File) {
 
 object SharedObject {
 
-  def compiler: String = {
-    if (System.getProperty("os.name").toLowerCase.contains("windows")) "x86_64-w64-mingw32-gcc"
-    else "gcc"
-  }
-
   def gcc(
       sources: Seq[File],
       output: File,
