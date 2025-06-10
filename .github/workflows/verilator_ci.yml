@@ -28,12 +28,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y git autoconf flex bison make libfl2 \
-              libfl-dev zlib1g-dev g++ libgoogle-perftools-dev ccache
+              libfl-dev zlib1g-dev g++ libgoogle-perftools-dev ccache help2man
 
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          brew install autoconf bison flex make gperf gnu-sed pkg-config
+          brew install autoconf bison flex make gperf gnu-sed pkg-config help2man
           brew link --overwrite bison
           brew link --overwrite flex
 
@@ -49,6 +49,7 @@ jobs:
             bison
             make
             python
+            help2man
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-pkg-config
 
