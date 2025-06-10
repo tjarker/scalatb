@@ -1,0 +1,9 @@
+.vscode
+.bloop
+.idea
+.metals
+.bsp
+build
+project
+target
+generated
