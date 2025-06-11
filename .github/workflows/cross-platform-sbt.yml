@@ -44,9 +44,15 @@ jobs:
         echo "Adding Verilator to PATH"
         echo "$MSYS2_LOC"
         echo "$MSYS2_LOC/mingw64/bin" >> "$GITHUB_PATH"
-    - name: Build and Test
+
+    - name: Show path
       shell: bash
       run: |
         echo $PATH
+    - name: verilator --version
+      shell: bash
+      run: |
         verilator --version
-        sbt +test
+    - name: sbt test
+      run: |
+        sbt test
