@@ -17,6 +17,7 @@ jobs:
         distribution: temurin
         java-version: 23
     - name: Setup sbt launcher
+      id: setup-sbt
       uses: sbt/setup-sbt@v1
     - name: Install dependencies (Ubuntu)
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-24.04-arm'
@@ -39,11 +40,11 @@ jobs:
       if: matrix.os == 'windows-latest'
       env:
         MSYS2_LOC: ${{ steps.msys2.outputs.msys2-location }}
-      shell: pwsh
+        SBT_LOC: ${{ steps.setup-sbt.outputs.sbt_toolpath }}
+
+      shell: msys2 {0}
       run: |
-        "Adding Verilator to PATH"
-        "$env:MSYS2_LOC"
-        "$env:MSYS2_LOC/mingw64/bin" | Out-File -FilePath "$env:GITHUB_PATH" -Append
+        echo $SBT_LOC/bin >> $GITHUB_PATH
     - name: Show path
       shell: bash
       run: |
@@ -57,7 +58,7 @@ jobs:
       run: |
         verilator --version
     - name: windows
-      shell: pwsh
+      shell: msys2 {0}
       if: matrix.os == 'windows-latest'
       run: |
         verilator --version
