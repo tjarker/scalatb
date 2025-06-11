@@ -45,6 +45,7 @@ jobs:
         echo "$MSYS2_LOC"
         echo "$MSYS2_LOC/mingw64/bin" >> "$GITHUB_PATH"
     - name: Build and Test
+      shell: bash
       run: |
         echo $PATH
         verilator --version
