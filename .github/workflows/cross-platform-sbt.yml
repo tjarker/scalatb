@@ -41,11 +41,22 @@ jobs:
       uses: msys2/setup-msys2@v2
       with:
         install: >-
+          mingw-w64-x86_64-curl
+          mingw-w64-x86_64-openjdk
           mingw-w64-x86_64-verilator
+    - name: Install sbt manually
+      if: matrix.os == 'windows-latest'
+      run: |
+        curl -L -o sbt.zip https://github.com/sbt/sbt/releases/download/v1.9.7/sbt-1.9.7.zip
+        unzip sbt.zip -d /opt
+        echo 'export PATH=/opt/sbt/bin:$PATH' >> ~/.bash_profile
+        source ~/.bash_profile
+        sbt sbtVersion
     - name: Build and Test (Windows)
       if: matrix.os == 'windows-latest'
       shell: msys2 {0}
       run: |
+        source ~/.bash_profile
         verilator --version
         sbt +test
     - name: Build and Test (Linux/macOS)
