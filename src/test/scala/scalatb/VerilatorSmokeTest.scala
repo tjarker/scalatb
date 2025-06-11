@@ -14,6 +14,13 @@ class VerilatorSmokeTest extends AnyFunSpec with Matchers {
 
   describe("Verilator") {
     it("should have a non-empty version string") {
+      
+      // get system path
+      System.getenv().forEach { (key, value) =>
+        println(s"$key=$value")
+      }
+
+
       val version = Verilator.getVersion
       version should not be empty
       val matcher = """\d.\d+""".r
