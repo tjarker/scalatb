@@ -8,15 +8,6 @@ jobs:
     strategy:
       matrix:
         OS: ["ubuntu-latest", "ubuntu-24.04-arm", "macos-latest", "windows-latest"]
-        include:
-          - os: ubuntu-latest
-            shell: bash
-          - os: ubuntu-24.04-arm
-            shell: bash
-          - os: macos-latest
-            shell: bash
-          - os: windows-latest
-            shell: msys2 {0}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -42,27 +33,11 @@ jobs:
       with:
         install: >-
           base-devel
-          curl
-          unzip
-          openjdk
           mingw-w64-x86_64-verilator
-    - name: Install sbt manually
+    - name: Add Verilator to PATH
       if: matrix.os == 'windows-latest'
-      run: |
-        curl -L -o sbt.zip https://github.com/sbt/sbt/releases/download/v1.9.7/sbt-1.9.7.zip
-        unzip sbt.zip -d /opt
-        echo 'export PATH=/opt/sbt/bin:$PATH' >> ~/.bash_profile
-        source ~/.bash_profile
-        sbt sbtVersion
-    - name: Build and Test (Windows)
-      if: matrix.os == 'windows-latest'
-      shell: msys2 {0}
-      run: |
-        source ~/.bash_profile
-        verilator --version
-        sbt +test
-    - name: Build and Test (Linux/macOS)
-      if: matrix.os != 'windows-latest'
+      run: echo "PATH=$PATH:/mingw64/bin" >> $GITHUB_ENV
+    - name: Build and Test
       run: |
         verilator --version
         sbt +test
