@@ -39,14 +39,13 @@ jobs:
       if: matrix.os == 'windows-latest'
       env:
         MSYS2_LOC: ${{ steps.msys2.outputs.msys2-location }}
+      shell: bash
       run: |
         echo "Adding Verilator to PATH"
         echo "$MSYS2_LOC"
-        ls -Force $env:MSYS2_LOC
-        ls -Force $env:MSYS2_LOC\mingw64
-        ls -Force $env:MSYS2_LOC\mingw64\bin
-        echo "$env:MSYS2_LOC\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "$MSYS2_LOC/mingw64/bin" >> "$GITHUB_PATH"
     - name: Build and Test
       run: |
+        echo $PATH
         verilator --version
         sbt +test
