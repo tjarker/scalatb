@@ -1,5 +1,4 @@
 name: Cross-Platform SBT Test
-run-name: ${{ github.workflow }} - ${{ github.actor }}
 on: [push, pull_request]
 
 jobs:
@@ -19,48 +18,8 @@ jobs:
     - name: Setup sbt launcher
       id: setup-sbt
       uses: sbt/setup-sbt@v1
-    - name: Install dependencies (Ubuntu)
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-24.04-arm'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y verilator
-    - name: Install dependencies (macOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        brew install verilator
-    - name: Install dependencies (Windows)
-      if: matrix.os == 'windows-latest'
-      uses: msys2/setup-msys2@v2
-      id: msys2
-      with:
-        install: >-
-          base-devel
-          mingw-w64-x86_64-verilator
-    - name: Add Verilator to PATH
-      if: matrix.os == 'windows-latest'
-      env:
-        MSYS2_LOC: ${{ steps.msys2.outputs.msys2-location }}
-        SBT_LOC: ${{ steps.setup-sbt.outputs.sbt_toolpath }}
-
-      shell: msys2 {0}
-      run: |
-        echo $SBT_LOC/bin >> $GITHUB_PATH
-    - name: Show path
-      shell: bash
-      run: |
-        echo $PATH
-    - name: show path win
-      if: matrix.os == 'windows-latest'
-      shell: pwsh
-      run: |
-        "$env:PATH"
-    - name: windows
-      shell: msys2 {0}
-      if: matrix.os == 'windows-latest'
-      run: |
-        verilator --version
-        sbt test
+    - name: setup verilator
+      uses: veryl-lang/setup-verilator@v1
     - name: sbt test
-      shell: bash
       run: |
         sbt test
