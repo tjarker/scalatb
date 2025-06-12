@@ -8,8 +8,7 @@ class SharedObjectTest extends AnyFunSpec with Matchers {
 
   describe("SharedObject") {
     it("should load a shared object and invoke a function") {
-      // Assuming the SharedObject and related classes are defined as in the provided code
-
+ 
       val funName = "hello"
 
       val code = s"""

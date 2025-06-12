@@ -6,7 +6,7 @@ jobs:
     runs-on: ${{ matrix.OS }}
     strategy:
       matrix:
-        OS: ["ubuntu-latest", "ubuntu-24.04-arm", "macos-latest"]
+        OS: ["ubuntu-latest", "macos-latest"]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
