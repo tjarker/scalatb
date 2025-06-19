@@ -7,7 +7,6 @@ import scala.sys.process.Process
 
 import shared._
 
-
 class SharedObject(libFile: File) {
 
   def load(): NativeLibrary = {
@@ -28,13 +27,10 @@ object SharedObject {
       output: File,
       options: Seq[String] = Seq("-shared", "-fPIC")
   ): Unit = {
-    val cmd = Seq("gcc") ++
+    val cmd = Seq("clang++", "-o", output.getAbsolutePath) ++
       options ++
-      sources.map(_.getAbsolutePath) ++
-      Seq(
-        "-o",
-        output.getAbsolutePath
-      )
+      sources.map(_.getAbsolutePath)
+    println(s"Running command: ${cmd.mkString(" ")}")
     val process = Process(cmd)
     val exitCode = process.!
     if (exitCode != 0) {

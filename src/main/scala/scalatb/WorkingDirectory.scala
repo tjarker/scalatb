@@ -17,7 +17,9 @@ object WorkingDirectory {
 class WorkingDirectory(val dir: File) {
 
     val artifacts = new ArrayBuffer[File]()
+    val subdirs = new ArrayBuffer[WorkingDirectory]()
 
+    def path: String = dir.getAbsolutePath
 
     def addFile(name: String, content: String): File = {
         val file = new File(dir, name)
@@ -27,8 +29,11 @@ class WorkingDirectory(val dir: File) {
         file
     }
 
-    def addSubDir(file: File): Unit = {
-        artifacts += file
+    def addSubDir(file: File): WorkingDirectory = {
+        file.mkdirs()
+        val subdir = new WorkingDirectory(file)
+        subdirs += subdir
+        subdir
     }
 
     def addArtifact(file: File): Unit = {
@@ -41,18 +46,14 @@ class WorkingDirectory(val dir: File) {
     }
 
     def deleteArtifact(file: File): Unit = {
-        if (file.exists()) {
-            if (file.isDirectory) {
-                file.list().foreach { child =>
-                    deleteArtifact(new File(file, child))
-                }
-            }
+        if (file.exists() && !file.isDirectory) {
             file.delete()
         }
     }
 
     def clean(): Unit = {
         artifacts.foreach(deleteArtifact)
+        subdirs.foreach(_.delete())
         artifacts.clear()
     }
 

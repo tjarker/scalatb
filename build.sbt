@@ -11,6 +11,8 @@ scalacOptions ++= Seq(
   "-Ymacro-annotations"
 )
 
+fork := true
+
 // Add your published framework dependency
 //libraryDependencies += "example" %% "mytest-framework" % "0.1.0"
 libraryDependencies += "net.java.dev.jna" % "jna" % "5.13.0"
@@ -19,6 +21,11 @@ libraryDependencies += "net.java.dev.jna" % "jna" % "5.13.0"
 // scalatest
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % Test
 
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core" % "0.12.0",
+  "io.circe" %% "circe-generic" % "0.12.0",
+  "io.circe" %% "circe-parser" % "0.12.0"
+)
 
 val chiselVersion = "6.0.0"
 addCompilerPlugin(

@@ -1,9 +1,11 @@
-package scalatb
+package scalatb.verilator
 
 import java.io.File
 import scala.util.{Try, Success, Failure}
 import coursier.core.Repository.Complete.Input.Ver
 import scala.collection.mutable.ListBuffer
+import java.nio.file.Path
+import shared.PathToFileOps
 
 object Verilator {
 
@@ -76,6 +78,15 @@ object Verilator {
     Verilator(Seq(Version), Seq())
       .map(_.trim.split(" ").apply(1))
       .toOption
+
+  def getIncludeDir(): Try[Seq[File]] = {
+    val base = "/usr/local/share/verilator/include".toFile
+
+    // get recursive list of directories in the base directory
+    val dirs = base.listFiles()
+      .filter(_.isDirectory)
+    Success(base +: dirs.toSeq)
+  }
 
   def apply(args: Seq[Argument], files: Seq[File]): Try[String] = {
     val command = Seq("verilator") ++

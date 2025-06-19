@@ -1,0 +1,8 @@
+package scalatb
+
+object Arcilator {
+
+  
+
+
+}

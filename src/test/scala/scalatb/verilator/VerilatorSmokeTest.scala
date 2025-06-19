@@ -1,4 +1,4 @@
-package scalatb
+package scalatb.verilator
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
