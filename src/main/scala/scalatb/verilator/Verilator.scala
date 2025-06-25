@@ -97,6 +97,10 @@ object Verilator {
 
     val base  = (verilatorBin.getParentFile.getAbsolutePath() + "/../share/verilator/include").toFile
 
+    if (!base.exists() || !base.isDirectory) {
+      return Failure(new Exception(s"Verilator include directory not found: ${base.getAbsolutePath}"))
+    }
+
     // get recursive list of directories in the base directory
     val dirs = base
       .listFiles()
