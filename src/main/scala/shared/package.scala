@@ -9,4 +9,21 @@ package object shared {
     def toDir: WorkingDirectory = WorkingDirectory(path)
   }
 
+  implicit class BigIntOps(val x: BigInt) {
+    def toWordArray: Array[Int] = {
+      (0 until (x.bitLength + 31) / 32)
+        .map { i =>
+          (x >> (i * 32)).toInt
+        }.toArray
+    }
+  }
+
+  implicit class WordArrayOps(val arr: Array[Int]) {
+    def toBigInt: BigInt = {
+      arr.foldRight(BigInt(0)) { (word, acc) =>
+        (acc << 32) | BigInt(word)
+      }
+    }
+  }
+
 }

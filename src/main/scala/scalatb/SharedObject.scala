@@ -22,38 +22,32 @@ class SharedObject(libFile: File) {
 
 object SharedObject {
 
-  def gcc(
-      sources: Seq[File],
-      output: File,
-      options: Seq[String] = Seq("-shared", "-fPIC")
-  ): Unit = {
-    val cmd = Seq("clang++", "-o", output.getAbsolutePath) ++
-      options ++
-      sources.map(_.getAbsolutePath)
-    println(s"Running command: ${cmd.mkString(" ")}")
-    val process = Process(cmd)
-    val exitCode = process.!
-    if (exitCode != 0) {
-      throw new RuntimeException(s"Compilation failed with exit code $exitCode")
-    }
-  }
-
   def sharedLibraryExtension: String = {
     if (System.getProperty("os.name").toLowerCase.contains("windows")) ".dll"
     else if (System.getProperty("os.name").toLowerCase.contains("mac")) ".dylib"
     else ".so"
   }
 
-  def create(
+  def createRecipe(
       libname: String,
       dir: WorkingDirectory,
       sources: Seq[File],
       options: Seq[String] = Seq.empty
-  ): SharedObject = {
-    val libFile = new File(dir.dir, libname + sharedLibraryExtension)
-    gcc(sources, libFile, Seq("-shared", "-fPIC") ++ options)
-    dir.addArtifact(libFile)
-    new SharedObject(libFile)
+  ): WorkingDirectory.Recipe[SharedObject] = {
+
+    val libFile = dir / (libname + sharedLibraryExtension)
+
+    val command = Seq("g++", "-shared", "-fPIC", "-o", libFile.getAbsolutePath()) ++
+      options ++
+      sources.map(_.getAbsolutePath)
+
+    dir.addRecipe(
+      Seq(libFile),
+      sources,
+      command,
+      fs => new SharedObject(fs.head)
+    )
+
   }
 
 }

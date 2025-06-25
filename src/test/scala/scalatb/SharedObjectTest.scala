@@ -4,6 +4,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
 import shared._
+import java.nio.file.Files
 class SharedObjectTest extends AnyFunSpec with Matchers {
 
   describe("SharedObject") {
@@ -13,16 +14,16 @@ class SharedObjectTest extends AnyFunSpec with Matchers {
 
       val code = s"""
         |#include <stdio.h>
-        |int $funName(int a, int b) {
+        |extern "C" int $funName(int a, int b) {
         |  return a + b;
         |}
         """.stripMargin
 
-      val workingDir = "build/so-test".toDir
+      val workingDir = new WorkingDirectory(Files.createTempDirectory("verilator-model-test-").toFile())
 
-      val src = workingDir.addFile("hello.c", code)
+      val src = workingDir.addFile("hello.cpp", code)
 
-      val sharedObject = SharedObject.create("libhello", workingDir, Seq(src))
+      val sharedObject = SharedObject.createRecipe("libhello", workingDir, Seq(src)).invoke()
 
       val nativeLib = sharedObject.load()
 

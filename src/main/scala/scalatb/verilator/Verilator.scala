@@ -2,10 +2,10 @@ package scalatb.verilator
 
 import java.io.File
 import scala.util.{Try, Success, Failure}
-import coursier.core.Repository.Complete.Input.Ver
 import scala.collection.mutable.ListBuffer
 import java.nio.file.Path
 import shared.PathToFileOps
+import scalatb.WorkingDirectory
 
 object Verilator {
 
@@ -33,7 +33,7 @@ object Verilator {
       case Include(path)            => Seq(s"-I$path")
       case Jobs(n)                  => Seq("-j", n.toString)
       case LdFlags(flags)           => Seq("-LDFLAGS", flags)
-      case CFlags(flags)            => Seq("-CFLAGS", flags)
+      case CFlags(flags)            => Seq("-CFLAGS", s"'$flags'")
       case OptimizationLevel(level) => Seq(s"-O$level")
       case TopModule(name)          => Seq("--top-module", name)
       case BuildDir(path)           => Seq("--Mdir", path)
@@ -72,7 +72,6 @@ object Verilator {
     case class OverrideTimeScale(scale: String) extends Argument
     case class CustomFlag(flag: String) extends Argument
   }
-  
 
   def getVersion: Option[String] =
     Verilator(Seq(Version), Seq())
@@ -83,17 +82,49 @@ object Verilator {
     val base = "/usr/local/share/verilator/include".toFile
 
     // get recursive list of directories in the base directory
-    val dirs = base.listFiles()
+    val dirs = base
+      .listFiles()
       .filter(_.isDirectory)
     Success(base +: dirs.toSeq)
   }
 
+  def createRecipe(
+      dir: WorkingDirectory,
+      name: String,
+      args: Seq[Argument],
+      files: Seq[File]
+  ): WorkingDirectory.Recipe[Seq[File]] = {
+
+    val command = Seq("verilator") ++
+      (args ++ Seq(Arguments.BuildDir(dir.path), Arguments.TopModule(name)))
+        .flatMap(_.toStrings) ++
+      files.map(_.getAbsolutePath)
+
+    // TODO: add/remove libs, such as fst, based on verilator flags
+    val targets = Seq(
+      dir / s"libV${name}.a",
+      dir / s"V${name}__ALL.a",
+      dir / "libverilated.a",
+      dir / "verilated_fst_c.o",
+    )
+
+    dir.addRecipe(
+      targets,
+      files,
+      command,
+      identity
+    )
+
+  }
+
   def apply(args: Seq[Argument], files: Seq[File]): Try[String] = {
+
     val command = Seq("verilator") ++
       args.flatMap(_.toStrings) ++
       files.map(
         _.getAbsolutePath
       )
+
     val stdout = new StringBuilder
     val stderr = new StringBuilder
     val logger = ProcessLogger(

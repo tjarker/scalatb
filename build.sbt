@@ -21,6 +21,8 @@ libraryDependencies += "net.java.dev.jna" % "jna" % "5.13.0"
 // scalatest
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % Test
 
+libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.13.12"
+
 libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % "0.12.0",
   "io.circe" %% "circe-generic" % "0.12.0",
