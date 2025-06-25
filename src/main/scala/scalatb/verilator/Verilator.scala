@@ -78,8 +78,24 @@ object Verilator {
       .map(_.trim.split(" ").apply(1))
       .toOption
 
+  def getExecutable: Option[File] = {
+    try {
+      val path = Seq("which", "verilator").!!.trim
+      Some(new File(path))
+    } 
+    catch {
+      case _: Throwable => None
+    }
+  }
+
   def getIncludeDir(): Try[Seq[File]] = {
-    val base = "/usr/local/share/verilator/include".toFile
+
+    // find verilator bin using which
+    val verilatorBin = getExecutable.getOrElse {
+      return Failure(new Exception("Verilator executable not found."))
+    }
+
+    val base  = (verilatorBin.getParentFile.getAbsolutePath() + "/../share/verilator/include").toFile
 
     // get recursive list of directories in the base directory
     val dirs = base
