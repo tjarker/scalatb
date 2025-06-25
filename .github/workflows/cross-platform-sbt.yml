@@ -18,8 +18,15 @@ jobs:
     - name: Setup sbt launcher
       id: setup-sbt
       uses: sbt/setup-sbt@v1
-    - name: setup verilator
-      uses: veryl-lang/setup-verilator@v1
+    - name: setup verilator (ubuntu)
+      if: matrix.OS == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y verilator
+    - name: setup verilator (macos)
+      if: matrix.OS == 'macos-latest' 
+      run: |
+        brew install verilator
     - name: sbt test
       run: |
         sbt test
