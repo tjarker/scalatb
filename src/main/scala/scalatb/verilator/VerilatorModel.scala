@@ -153,7 +153,8 @@ object VerilatorModel {
         sources = artifacts ++ Seq(harness),
         options = Verilator.getIncludeDir().get.map(i => s"-I$i") ++ Seq(
           "-lz",
-          s"-I${verDir.path}"
+          s"-I${verDir.path}",
+          "-std=gnu++17",
         ) ++ options
       )
       .invoke()
