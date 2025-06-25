@@ -146,6 +146,11 @@ object VerilatorModel {
       symbols
     )
 
+    val extraOptions =
+      if (System.getProperty("os.name").toLowerCase.contains("windows")) Seq()
+      else if (System.getProperty("os.name").toLowerCase.contains("mac")) Seq()
+      else Seq("-pthread", "-lpthread", "-atomic")
+
     val sharedObject = SharedObject
       .createRecipe(
         libname = s"lib$name",
@@ -154,8 +159,8 @@ object VerilatorModel {
         options = Verilator.getIncludeDir().get.map(i => s"-I$i") ++ Seq(
           "-lz",
           s"-I${verDir.path}",
-          "-std=gnu++17",
-        ) ++ options
+          "-std=gnu++17"
+        ) ++ extraOptions ++ options
       )
       .invoke()
 
@@ -391,14 +396,11 @@ object VerilatoModelTest extends App {
 
   dut.tick(100)
 
-  
-
   println(s"Output is: ${dut("myReg").peekInt()} (${dut("myReg").peek()})")
   println(dut("myReg") + 10)
 
   dut.delete()
 
   println("VerilatorModel test completed successfully.")
-
 
 }
