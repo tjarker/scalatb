@@ -145,7 +145,7 @@ object VerilatorModelHarness {
       .mkString("\n")
 
     s"""|uint64_t ${getFunName(m)}(${m}_context_t* ctx, uint64_t id) {
-        |  printf("Getting value for id %llu\\n", id);
+        |  printf("Getting value for id %lu\\n", id);
         |  switch (id) {
         |${cases.indent(4)}
         |    default:
@@ -188,7 +188,7 @@ object VerilatorModelHarness {
       .mkString("\n")
 
     s"""|void ${setMemFunName(m)}(${m}_context_t* ctx, uint64_t id, uint64_t value, uint32_t index) {
-        |  printf("Setting memory %llu at index %u to value %llu\\n", id, index, value);
+        |  printf("Setting memory %lu at index %u to value %lu\\n", id, index, value);
         |  switch (id) {
         |${cases.indent(4)}
         |  }
