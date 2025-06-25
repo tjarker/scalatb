@@ -149,7 +149,7 @@ object VerilatorModel {
     val extraOptions =
       if (System.getProperty("os.name").toLowerCase.contains("windows")) Seq()
       else if (System.getProperty("os.name").toLowerCase.contains("mac")) Seq()
-      else Seq("-pthread", "-lpthread", "-atomic")
+      else Seq("-pthread", "-lpthread", "-latomic")
 
     val sharedObject = SharedObject
       .createRecipe(
